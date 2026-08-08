@@ -13,3 +13,18 @@ NoDisplay=false
 # /proc/PID/exe, finds the .desktop whose Exec matches, and reads this key.
 # Without it every capture returns org.kde.KWin.ScreenShot2.Error.NoAuthorized.
 X-KDE-DBUS-Restricted-Interfaces=org.kde.KWin.ScreenShot2
+
+# Bind Print here rather than via a custom shortcut in System Settings.
+#
+# WHY THIS MATTERS AND IS NOT COSMETIC
+#   KWin authorizes ScreenShot2 by resolving the caller's /proc/PID/exe,
+#   collecting every installed .desktop whose Exec matches, and reading
+#   X-KDE-DBUS-Restricted-Interfaces from servicesFound.FIRST(). A custom
+#   shortcut makes KDE write a NEW entry (net.local.<name>.desktop) that points
+#   at the same binary and carries no authorization key -- so whichever entry
+#   happens to sort first decides whether captures work at all, and rebuilding
+#   the sycoca cache can silently flip it.
+#
+#   Declaring the shortcut on the authorized entry means there is exactly one
+#   .desktop for this binary, and rebinding cannot produce an unauthorized twin.
+X-KDE-Shortcuts=Print
