@@ -1,0 +1,7 @@
+flare
+moc_*.cpp
+*.o
+*.so
+pkg/
+src-pkg/
+*.pkg.tar.zst
