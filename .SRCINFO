@@ -1,0 +1,18 @@
+pkgbase = flare-screenshot-git
+	pkgdesc = Screenshot tool for KDE Plasma Wayland that skips the XDG portal
+	pkgver = 0.4.0
+	pkgrel = 1
+	url = https://github.com/jibsta210/flare
+	arch = x86_64
+	license = MIT
+	makedepends = git
+	makedepends = gcc
+	depends = qt6-base
+	depends = wl-clipboard
+	provides = flare
+	conflicts = flare
+	options = !lto
+	source = git+https://github.com/jibsta210/flare.git
+	sha256sums = SKIP
+
+pkgname = flare-screenshot-git
