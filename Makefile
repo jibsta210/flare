@@ -35,22 +35,21 @@ moc_overlay.cpp: src/overlay.h
 # caller's /proc/PID/exe and matching it against an installed .desktop file's
 # Exec line. If they disagree, every capture fails with NoAuthorized -- so the
 # desktop file is generated from PREFIX rather than shipped with a fixed path.
-install: flare
+flare.desktop: flare.desktop.in
+	sed 's|@BINDIR@|$(PREFIX)/bin|' $< > $@
+
+install: flare flare.desktop
 	install -Dm755 flare $(DESTDIR)$(PREFIX)/bin/flare
-	sed 's|@BINDIR@|$(PREFIX)/bin|' flare.desktop.in \
-	    > $(DESTDIR)/tmp/flare.desktop.$$$$ && \
-	  install -Dm644 $(DESTDIR)/tmp/flare.desktop.$$$$ \
-	    $(DESTDIR)/usr/share/applications/flare.desktop && \
-	  rm -f $(DESTDIR)/tmp/flare.desktop.$$$$
+	install -Dm644 flare.desktop $(DESTDIR)$(PREFIX)/share/applications/flare.desktop
 	@echo "installed flare to $(PREFIX)/bin/flare"
-	@command -v update-desktop-database >/dev/null && \
-	  update-desktop-database /usr/share/applications 2>/dev/null || true
+	@command -v update-desktop-database >/dev/null 2>&1 && \
+	  update-desktop-database $(PREFIX)/share/applications 2>/dev/null || true
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/flare
-	rm -f $(DESTDIR)/usr/share/applications/flare.desktop
+	rm -f $(DESTDIR)$(PREFIX)/share/applications/flare.desktop
 
 clean:
-	rm -f flare moc_overlay.cpp
+	rm -f flare flare.desktop moc_overlay.cpp
 
 .PHONY: all install uninstall clean
