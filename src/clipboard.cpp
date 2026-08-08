@@ -70,6 +70,6 @@ bool copyImageToClipboard(const QImage &image, QString *how)
     mime->setImageData(image);
     mime->setData(QStringLiteral("image/png"), png);
     QGuiApplication::clipboard()->setMimeData(mime);
-    if (how) *how = QStringLiteral("qt (only while flare runs)");
+    if (how) *how = QStringLiteral("qt (only while kshot runs)");
     return true;
 }

@@ -1,11 +1,11 @@
 #!/bin/bash
-# Publish flare to the AUR as flare-screenshot-git.
+# Publish kshot to the AUR as kshot-git.
 #
 # Split out because the AUR was down for maintenance when the package was first
 # prepared. Idempotent: safe to re-run to push an updated PKGBUILD.
 set -euo pipefail
 
-PKG=flare-screenshot-git
+PKG=kshot-git
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 
@@ -26,6 +26,6 @@ if git diff --cached --quiet; then
     echo "==> nothing changed"
     exit 0
 fi
-git commit -m "${1:-Initial import: flare-screenshot-git}"
+git commit -m "${1:-Initial import: kshot-git}"
 git push origin master
 echo "==> https://aur.archlinux.org/packages/$PKG"

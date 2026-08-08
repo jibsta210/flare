@@ -110,7 +110,7 @@ CaptureResult captureWorkspace(bool includeCursor, QString *error)
         if (reply.error().name().contains(QLatin1String("NoAuthorized"))) {
             *error += QStringLiteral(
                 "\n\nKWin refused: this binary is not authorized for ScreenShot2.\n"
-                "Install the .desktop file (make install) and launch flare from its\n"
+                "Install the .desktop file (make install) and launch kshot from its\n"
                 "installed path so KWin can match /proc/PID/exe to it.");
         }
         return result;

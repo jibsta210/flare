@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=KShot
+GenericName=Screenshot
+Comment=Screenshot capture without the XDG portal round-trip
+Exec=/usr/local/bin/kshot
+Icon=camera-photo
+Terminal=false
+Categories=Graphics;Utility;
+NoDisplay=false
+
+# This is what authorizes the binary. KWin maps the calling PID to
+# /proc/PID/exe, finds the .desktop whose Exec matches, and reads this key.
+# Without it every capture returns org.kde.KWin.ScreenShot2.Error.NoAuthorized.
+X-KDE-DBUS-Restricted-Interfaces=org.kde.KWin.ScreenShot2

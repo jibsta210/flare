@@ -34,7 +34,7 @@ QString logPath()
 {
     const QString dir =
         QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
-        QStringLiteral("/flare");
+        QStringLiteral("/kshot");
     QDir().mkpath(dir);
     return dir + QStringLiteral("/captures.jsonl");
 }
@@ -55,7 +55,8 @@ QString bootId()
 
 } // namespace
 
-void recordCapture(const QString &event, qint64 elapsedMs, qint64 bytes, const QString &detail)
+void recordCapture(const QString &event, qint64 elapsedMs, qint64 bytes, const QString &detail,
+                   qint64 clipboardMs, qint64 saveMs, qint64 totalMs)
 {
     QJsonObject o;
     o.insert(QStringLiteral("iso"), QDateTime::currentDateTime().toString(Qt::ISODate));
@@ -67,6 +68,13 @@ void recordCapture(const QString &event, qint64 elapsedMs, qint64 bytes, const Q
     o.insert(QStringLiteral("path"), QStringLiteral("screenshot2"));
     if (!detail.isEmpty())
         o.insert(QStringLiteral("detail"), detail);
+    // The capture is only one phase. The clipboard hand-off blocks on wl-copy
+    // forking its holder process, and that was previously untimed -- so a stall
+    // there was invisible while "capture was fast" looked like proof it wasn't
+    // the clipboard. Measure every phase or measure nothing.
+    if (clipboardMs >= 0) o.insert(QStringLiteral("clipboard_ms"), clipboardMs);
+    if (saveMs >= 0)      o.insert(QStringLiteral("save_ms"), saveMs);
+    if (totalMs >= 0)     o.insert(QStringLiteral("total_ms"), totalMs);
 
     QFile f(logPath());
     if (!f.open(QIODevice::Append | QIODevice::WriteOnly))

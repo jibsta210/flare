@@ -1,4 +1,4 @@
-# flare
+# kshot
 
 A screenshot tool for KDE Plasma Wayland that skips the XDG portal.
 
@@ -15,14 +15,14 @@ Most cross-platform screenshot tools capture through
 buys those tools portability across X11, GNOME, Sway, Windows and macOS — it is
 a real engineering trade, not sloppiness.
 
-If you only care about KDE Plasma Wayland, you can call KWin directly. flare
+If you only care about KDE Plasma Wayland, you can call KWin directly. kshot
 invokes `org.kde.KWin.ScreenShot2` with a pipe and KWin writes raw pixels
 straight into it. One D-Bus round trip.
 
 Measured on a Dell XPS 16 (Panther Lake, Plasma 6.7.4, 3200×2001), numbers taken
 from the system journal rather than a benchmark harness:
 
-|  | portal-based tool | flare |
+|  | portal-based tool | kshot |
 |---|---|---|
 | capture path | app → portal → KWin | app → KWin |
 | CPU per capture | 1.28 s | — |
@@ -34,14 +34,14 @@ its exported-dmabuf count does not move.
 
 ## What it is not
 
-**KDE Plasma Wayland only, by construction.** flare hardcodes
+**KDE Plasma Wayland only, by construction.** kshot hardcodes
 `org.kde.KWin.ScreenShot2`. It will not work on GNOME, Sway, wlroots, or X11.
 If you need any of those, use [Flameshot](https://github.com/flameshot-org/flameshot)
 — it is a better-rounded tool and the portal path is precisely why.
 
 If you are happy with a screenshot *application*, KDE ships
 [Spectacle](https://apps.kde.org/spectacle/), which has a full annotation editor
-and is more featureful than this. flare exists for the single-surface flow —
+and is more featureful than this. kshot exists for the single-surface flow —
 drag, annotate, copy, gone — not because Spectacle lacks capability.
 
 ---
@@ -56,7 +56,7 @@ make
 sudo make install
 ```
 
-Then bind `/usr/local/bin/flare` to a key in
+Then bind `/usr/local/bin/kshot` to a key in
 **System Settings → Keyboard → Shortcuts → Custom Shortcuts** (Print is the
 obvious choice).
 
@@ -71,8 +71,8 @@ every capture returns:
 org.kde.KWin.ScreenShot2.Error.NoAuthorized
 ```
 
-So `make install` places both the binary at `/usr/local/bin/flare` **and**
-`flare.desktop` in `/usr/share/applications/`. Move the binary without updating
+So `make install` places both the binary at `/usr/local/bin/kshot` **and**
+`kshot.desktop` in `/usr/share/applications/`. Move the binary without updating
 the desktop file and captures stop working.
 
 A consequence worth knowing: **a script can never be authorized for this API**,
@@ -84,11 +84,11 @@ would let every Python program on the system capture your screen silently.
 ## Usage
 
 ```
-flare                 # capture, then select and annotate
-flare --full          # whole workspace, no editor
-flare -o shot.png     # write to a specific file
-flare --cursor        # include the mouse cursor
-flare --save          # always write a file, even on Copy
+kshot                 # capture, then select and annotate
+kshot --full          # whole workspace, no editor
+kshot -o shot.png     # write to a specific file
+kshot --cursor        # include the mouse cursor
+kshot --save          # always write a file, even on Copy
 ```
 
 ### In the editor
@@ -119,7 +119,7 @@ Three things cost real debugging time and are not obvious:
 process serves the bytes when something pastes. A tool that sets the clipboard
 and exits leaves nothing behind. Qt compounds this by quitting when the last
 window closes, and by being unable to set a selection at all with no window
-(there is no surface or input serial). flare pipes the PNG to `wl-copy`, which
+(there is no surface or input serial). kshot pipes the PNG to `wl-copy`, which
 forks a holder process. That is the same approach other Wayland tools take.
 
 **`Qt::BypassWindowManagerHint` breaks keyboard focus on Wayland.** It is an X11

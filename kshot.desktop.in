@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
-Name=Flare
+Name=KShot
 GenericName=Screenshot
 Comment=Screenshot capture without the XDG portal round-trip
-Exec=@BINDIR@/flare
+Exec=@BINDIR@/kshot
 Icon=camera-photo
 Terminal=false
 Categories=Graphics;Utility;

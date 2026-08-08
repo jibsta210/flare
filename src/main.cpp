@@ -1,4 +1,4 @@
-// flare -- screenshot capture that skips the XDG portal.
+// kshot -- screenshot capture that skips the XDG portal.
 //
 // Default flow: capture the workspace via KWin ScreenShot2, then show a
 // fullscreen overlay to select a region and annotate. --full skips the overlay.
@@ -25,7 +25,7 @@ static QString defaultPath()
     const QString dir = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation) +
                         QStringLiteral("/Screenshots");
     QDir().mkpath(dir);
-    return dir + QStringLiteral("/flare-%1.png")
+    return dir + QStringLiteral("/kshot-%1.png")
                      .arg(QDateTime::currentDateTime().toString(QStringLiteral("yyyyMMdd-hhmmss")));
 }
 
@@ -60,7 +60,7 @@ static void holdClipboardThenQuit(QApplication &app, int capMs = 4000)
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
-    app.setApplicationName(QStringLiteral("flare"));
+    app.setApplicationName(QStringLiteral("kshot"));
     app.setApplicationVersion(QStringLiteral("0.3.0"));
 
     // Must be false: closing the overlay would otherwise terminate the process
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     QCommandLineOption saveAlwaysOpt(QStringLiteral("save"),
                                      QStringLiteral("Always write a file, even on Copy."));
     // Wait before capturing. Needed to photograph transient UI -- menus,
-    // tooltips, and flare's own overlay, which cannot otherwise be captured
+    // tooltips, and kshot's own overlay, which cannot otherwise be captured
     // because it grabs the keyboard and a second instance would fight it.
     QCommandLineOption delayOpt(QStringLiteral("delay"),
                                 QStringLiteral("Wait <seconds> before capturing."),
@@ -94,7 +94,7 @@ int main(int argc, char **argv)
     if (parser.isSet(delayOpt)) {
         const double secs = parser.value(delayOpt).toDouble();
         if (secs > 0) {
-            out << "flare: capturing in " << secs << "s...\n";
+            out << "kshot: capturing in " << secs << "s...\n";
             out.flush();
             // Spin the event loop rather than sleeping: a bare sleep would block
             // Qt from ever creating its Wayland connection, and the capture
@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 
     if (!r.ok) {
         recordCapture(QStringLiteral("capture_fail"), elapsed, 0, error);
-        err << "flare: " << error << "\n";
+        err << "kshot: " << error << "\n";
         return 1;
     }
     recordCapture(QStringLiteral("capture_ok"), elapsed, r.bytes,
@@ -121,14 +121,18 @@ int main(int argc, char **argv)
 
     auto finish = [&](const QImage &img, bool save) {
         if (img.isNull()) {
-            out << "flare: cancelled\n";
+            out << "kshot: cancelled\n";
             app.quit();
             return;
         }
 
+        QElapsedTimer phase;
+        phase.start();
         QString how;
         if (!copyImageToClipboard(img, &how))
-            err << "flare: clipboard copy failed\n";
+            err << "kshot: clipboard copy failed\n";
+        const qint64 clipMs = phase.elapsed();
+        phase.restart();
 
         // Copy means copy. Save (or --save / -o) writes a file. The previous
         // build ORed in "not --clipboard-only", so Copy always saved too.
@@ -136,13 +140,17 @@ int main(int argc, char **argv)
         if (write) {
             const QString path = parser.isSet(outOpt) ? parser.value(outOpt) : defaultPath();
             if (!img.save(path))
-                err << "flare: could not save to " << path << "\n";
+                err << "kshot: could not save to " << path << "\n";
             else
-                out << "flare: " << img.width() << "x" << img.height()
+                out << "kshot: " << img.width() << "x" << img.height()
                     << " -> clipboard + " << path << "\n";
         } else {
-            out << "flare: " << img.width() << "x" << img.height() << " -> clipboard (" << how << ")\n";
+            out << "kshot: " << img.width() << "x" << img.height() << " -> clipboard (" << how << ")\n";
         }
+        recordCapture(QStringLiteral("deliver"), -1, 0,
+                      QStringLiteral("via=%1").arg(how), clipMs, phase.elapsed(),
+                      elapsed + clipMs + phase.elapsed());
+
         // wl-copy holds the selection in its own forked process, so we can go
         // as soon as the file is written. Only the Qt fallback needs us alive.
         if (how.startsWith(QStringLiteral("qt")))

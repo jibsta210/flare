@@ -1,10 +1,10 @@
 # Maintainer: Jake Steinman <j@metarealtyinc.ca>
-pkgname=flare-screenshot-git
+pkgname=kshot-git
 pkgver=0.4.0
 pkgrel=1
 pkgdesc="Screenshot tool for KDE Plasma Wayland that skips the XDG portal"
 arch=('x86_64')
-url="https://github.com/jibsta210/flare"
+url="https://github.com/jibsta210/kshot"
 license=('MIT')
 # Qt6 exports protected symbols (QObject's typeinfo) that LTO cannot emit copy
 # relocations against: "copy relocation against non-copyable protected symbol
@@ -13,24 +13,24 @@ license=('MIT')
 options=('!lto')
 depends=('qt6-base' 'wl-clipboard')
 makedepends=('git' 'gcc')
-provides=('flare')
-conflicts=('flare')
-source=("git+https://github.com/jibsta210/flare.git")
+provides=('kshot')
+conflicts=('kshot')
+source=("git+https://github.com/jibsta210/kshot.git")
 sha256sums=('SKIP')
 
 pkgver() {
-  cd "$srcdir/flare"
+  cd "$srcdir/kshot"
   printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
 build() {
-  cd "$srcdir/flare"
+  cd "$srcdir/kshot"
   make
 }
 
 package() {
-  cd "$srcdir/flare"
-  # PREFIX must match the Exec= line in flare.desktop: KWin authorizes
+  cd "$srcdir/kshot"
+  # PREFIX must match the Exec= line in kshot.desktop: KWin authorizes
   # ScreenShot2 by matching /proc/PID/exe against an installed desktop file.
   make DESTDIR="$pkgdir" PREFIX=/usr install
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"

@@ -1,4 +1,4 @@
-# flare -- plain g++ + pkg-config; no build-system ceremony for six files.
+# kshot -- plain g++ + pkg-config; no build-system ceremony for six files.
 PREFIX ?= /usr/local
 DESTDIR ?=
 CXX ?= g++
@@ -21,9 +21,9 @@ SRC := src/capture.cpp src/telemetry.cpp src/icons.cpp src/clipboard.cpp \
        src/overlay.cpp src/main.cpp
 HDR := src/capture.h src/telemetry.h src/icons.h src/clipboard.h src/overlay.h
 
-all: flare
+all: kshot
 
-flare: $(SRC) $(HDR) moc_overlay.cpp
+kshot: $(SRC) $(HDR) moc_overlay.cpp
 	$(CXX) $(CXXFLAGS) $(REQFLAGS) $(LDFLAGS) $(REQLDFLAGS) -o $@ $(SRC) moc_overlay.cpp $(QTFLAGS)
 
 # Overlay uses Q_OBJECT. NOTE: a bare `moc` on PATH is often Qt5's and fails
@@ -35,21 +35,21 @@ moc_overlay.cpp: src/overlay.h
 # caller's /proc/PID/exe and matching it against an installed .desktop file's
 # Exec line. If they disagree, every capture fails with NoAuthorized -- so the
 # desktop file is generated from PREFIX rather than shipped with a fixed path.
-flare.desktop: flare.desktop.in
+kshot.desktop: kshot.desktop.in
 	sed 's|@BINDIR@|$(PREFIX)/bin|' $< > $@
 
-install: flare flare.desktop
-	install -Dm755 flare $(DESTDIR)$(PREFIX)/bin/flare
-	install -Dm644 flare.desktop $(DESTDIR)$(PREFIX)/share/applications/flare.desktop
-	@echo "installed flare to $(PREFIX)/bin/flare"
+install: kshot kshot.desktop
+	install -Dm755 kshot $(DESTDIR)$(PREFIX)/bin/kshot
+	install -Dm644 kshot.desktop $(DESTDIR)$(PREFIX)/share/applications/kshot.desktop
+	@echo "installed kshot to $(PREFIX)/bin/kshot"
 	@command -v update-desktop-database >/dev/null 2>&1 && \
 	  update-desktop-database $(PREFIX)/share/applications 2>/dev/null || true
 
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/flare
-	rm -f $(DESTDIR)$(PREFIX)/share/applications/flare.desktop
+	rm -f $(DESTDIR)$(PREFIX)/bin/kshot
+	rm -f $(DESTDIR)$(PREFIX)/share/applications/kshot.desktop
 
 clean:
-	rm -f flare flare.desktop moc_overlay.cpp
+	rm -f kshot kshot.desktop moc_overlay.cpp
 
 .PHONY: all install uninstall clean
