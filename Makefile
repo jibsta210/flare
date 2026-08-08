@@ -13,7 +13,7 @@ HDR := src/capture.h src/telemetry.h src/icons.h src/clipboard.h src/overlay.h
 all: flare
 
 flare: $(SRC) $(HDR) moc_overlay.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $(SRC) moc_overlay.cpp $(QTFLAGS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(SRC) moc_overlay.cpp $(QTFLAGS)
 
 # Overlay uses Q_OBJECT. NOTE: a bare `moc` on PATH is often Qt5's and fails
 # with "generated using the moc from 5.15.x" -- resolve Qt6's explicitly.
