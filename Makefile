@@ -35,8 +35,17 @@ moc_overlay.cpp: src/overlay.h
 # caller's /proc/PID/exe and matching it against an installed .desktop file's
 # Exec line. If they disagree, every capture fails with NoAuthorized -- so the
 # desktop file is generated from PREFIX rather than shipped with a fixed path.
-kshot.desktop: kshot.desktop.in
+#
+# Regenerated UNCONDITIONALLY (FORCE). PREFIX can change between invocations
+# without kshot.desktop.in changing, and make cannot see that: it compares
+# mtimes only. Without FORCE, `make install PREFIX=/usr` after a /usr/local
+# build silently reuses the stale file. That is exactly how the first AUR
+# package shipped broken -- binary at /usr/bin/kshot, Exec=/usr/local/bin/kshot,
+# NoAuthorized on every capture.
+kshot.desktop: kshot.desktop.in FORCE
 	sed 's|@BINDIR@|$(PREFIX)/bin|' $< > $@
+
+FORCE:
 
 install: kshot kshot.desktop
 	install -Dm755 kshot $(DESTDIR)$(PREFIX)/bin/kshot
@@ -52,4 +61,4 @@ uninstall:
 clean:
 	rm -f kshot kshot.desktop moc_overlay.cpp
 
-.PHONY: all install uninstall clean
+.PHONY: all install uninstall clean FORCE

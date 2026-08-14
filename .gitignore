@@ -1,5 +1,11 @@
-flare
-flare.desktop
+# Build artifacts. kshot and kshot.desktop are GENERATED and must never be
+# committed: kshot.desktop is produced from kshot.desktop.in with PREFIX baked
+# into Exec=, so a committed copy carries one machine's PREFIX and silently
+# overrides everyone else's. That shipped a broken AUR package once already --
+# binary at /usr/bin/kshot, desktop file claiming /usr/local/bin/kshot, and KWin
+# denying every capture with NoAuthorized.
+kshot
+kshot.desktop
 moc_*.cpp
 *.o
 *.so
